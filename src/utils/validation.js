@@ -28,3 +28,14 @@ export const ServiceValidationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     price: Yup.string().required("Price is required"),
 })
+
+
+// =========ORDERS==================
+
+
+export const orderValidationSchema = Yup.object().shape({
+    amount: Yup.string().required("Amount is required"),
+    client_full_name: Yup.string().required("Full name is required"),
+    client_phone_number: Yup.string().required("Full name is required")
+
+})

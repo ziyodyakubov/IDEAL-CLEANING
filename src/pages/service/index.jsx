@@ -9,8 +9,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import service from "../../service/service";
 import Button from "@mui/material/Button";
+import service from "../../service/service";
 import ServiceModal from "../../components/modal/sevice-modal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -38,18 +38,19 @@ const Index = () => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await service.get();
-        if (response.status === 200) {
-          setServices(response.data.services);
-        }
-      } catch (error) {
-        setError("Error fetching data");
-        console.error("Error fetching data:", error);
+  const fetchData = async () => {
+    try {
+      const response = await service.get();
+      if (response.status === 200) {
+        setServices(response.data.services);
       }
-    };
+    } catch (error) {
+      setError("Error fetching data");
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -96,25 +97,20 @@ const Index = () => {
             <TableRow>
               <StyledTableCell>T/R</StyledTableCell>
               <StyledTableCell>Name</StyledTableCell>
-              <StyledTableCell align="right">Price</StyledTableCell>
-              <StyledTableCell align="right">Edit</StyledTableCell>
-              <StyledTableCell align="right">Delete</StyledTableCell>
+              <StyledTableCell align="center">Price</StyledTableCell>
+              <StyledTableCell align="center">Action</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {services.map((row, index) => (
               <StyledTableRow key={row.id}>
                 <StyledTableCell>{index + 1}</StyledTableCell>
-                <StyledTableCell>{row.name}</StyledTableCell>
-                <StyledTableCell align="right">{`${row.price} UZS`}</StyledTableCell>
-                <StyledTableCell align="right">
-                  <Button onClick={() => editItem(row)}>
-                    <EditIcon color="error" />
-                  </Button>
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                  <Button onClick={() => deleteItem(row.id)}>
-                    <DeleteIcon color="error" />
+                <StyledTableCell>{row.name.charAt(0).toUpperCase() + row.name.slice(1)}</StyledTableCell>
+                <StyledTableCell align="center">{`${row.price} UZS`}</StyledTableCell>
+                <StyledTableCell align="center">
+                  <Button>
+                    <EditIcon color="error" onClick={() => editItem(row)} />
+                    <DeleteIcon color="error" onClick={() => deleteItem(row.id)} />
                   </Button>
                 </StyledTableCell>
               </StyledTableRow>
@@ -123,7 +119,7 @@ const Index = () => {
         </Table>
       </TableContainer>
 
-      <ServiceModal open={open} handleClose={handleClose} edit={edit} />
+      <ServiceModal open={open} handleClose={handleClose} edit={edit} fetchData={fetchData} />
     </div>
   );
 };

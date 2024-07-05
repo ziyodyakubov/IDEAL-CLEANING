@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Modal, Button, TextField } from "@mui/material";
+import { Box, Typography, Modal, Button, TextField, Select, MenuItem } from "@mui/material";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import { ServiceValidationSchema } from "../../../utils/validation";
-import service from "../../../service/service";
+import { orderValidationSchema } from "../../../utils/validation";
+import order from "../../../service/order";
+import service from "../../../service/service"
 
 const style = {
   position: "absolute",
@@ -18,27 +19,50 @@ const style = {
   outline: "none",
 };
 
-const ServiceModal = ({ open, handleClose, edit, fetchData }) => {
+const OrderModal = ({ open, handleClose, edit, fetchData }) => {
+    const [services,setServices] = useState([])
   const initialValues = {
-    name: edit ? edit.name : "",
-    price: edit ? edit.price : 0,
+    amount: edit ? edit.amount : 0,
+    client_full_name: edit ? edit.client_full_name : "",
+    client_phone_number: edit ? edit.client_phone_number : "+998",
+    service_id:edit ? edit.service_id : "" 
   };
+
+
+const fetchInfo = async () => {
+    try {
+      const response = await service.get();
+      if (response.status === 200) {
+        setServices(response.data.services);
+      }
+    } catch (error) {
+      setError("Error fetching data");
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchInfo();
+  }, []);
 
   const handleSubmit = async (values) => {
     try {
       console.log("Submitted values:", values);
+      const payload = {id:service.id,...values}
+
       let response;
       if (edit && edit.id) {
-        response = await service.edit({ id: edit.id, ...values });
+        response = await order.edit(payload);
         console.log("Edit response:", response);
       } else {
-        response = await service.add(values);
+        response = await order.add(payload);
         console.log("Add response:", response);
       }
 
-      if (response.status === 200 || response.status === 201) {
+      if (response.status === 201) {
         fetchData();
         handleClose();
+        console.log("Boganku")
       } else {
         console.error("Error: ", response.statusText, response.data);
       }
@@ -63,36 +87,63 @@ const ServiceModal = ({ open, handleClose, edit, fetchData }) => {
       <Box sx={style}>
         <div>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            {edit ? "Edit Service" : "Add Service"}
+            {edit ? "Edit Order" : "Add Order"}
           </Typography>
           <Formik
             initialValues={initialValues}
             onSubmit={handleSubmit}
-            validationSchema={ServiceValidationSchema}
+            validationSchema={orderValidationSchema}
             enableReinitialize={true}
           >
             {({ isSubmitting }) => (
               <Form>
                 <Field
-                  name="name"
-                  type="text"
+                  name="amount"
+                  type="number"
                   as={TextField}
-                  label="Service Name"
+                  label="Amount"
                   fullWidth
                   margin="normal"
                   variant="outlined"
                   helperText={<ErrorMessage name="name" component="span" />}
                 />
                 <Field
-                  name="price"
-                  type="number"
+                  name="client_full_name"
+                  type="text"
                   as={TextField}
-                  label="Service Price"
+                  label="Full name"
                   fullWidth
                   margin="normal"
                   variant="outlined"
                   helperText={<ErrorMessage name="price" component="span" />}
                 />
+                 <Field
+                  name="client_phone_number"
+                  type="text"
+                  as={TextField}
+                  label="Phone number"
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="price" component="span" />}
+                />
+
+                   <Field
+                  name="service_id"
+                  type="text"
+                  as={Select}
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  helperText={<ErrorMessage name="price" component="span" />}
+                >
+                    {services.map((item,index)=>(
+                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                    )
+                    )}
+                    
+                </Field>
+
                 <div
                   style={{
                     display: "flex",
@@ -127,4 +178,4 @@ const ServiceModal = ({ open, handleClose, edit, fetchData }) => {
   );
 };
 
-export default ServiceModal;
+export default OrderModal;
