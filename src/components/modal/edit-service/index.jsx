@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { ServiceValidationSchema } from "../../../utils/validation";
 import service from "../../../service/service";
+import Notification from "../../../utils/notification";
 
 
 const style = {
@@ -38,7 +39,14 @@ export default function AddService() {
     try {
       const responce = await service.update(values);
       if(responce.status === 201){
+      Notification({
+        title: "Successfully edited",
+        type: "success",
+      })
+
+      setTimeout(function(){
         window.location.reload()
+      },2000)
       }
       
     } catch (err) {

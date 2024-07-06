@@ -3,6 +3,7 @@ import { Box, Typography, Modal, Button, TextField } from "@mui/material";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { ServiceValidationSchema } from "../../../utils/validation";
 import service from "../../../service/service";
+import Notification from "../../../utils/notification";
 
 const style = {
   position: "absolute",
@@ -30,10 +31,16 @@ const ServiceModal = ({ open, handleClose, edit, fetchData }) => {
       let response;
       if (edit && edit.id) {
         response = await service.edit({ id: edit.id, ...values });
-        console.log("Edit response:", response);
+      Notification({
+        title: "Successfully edited",
+        type: "success",
+      })
       } else {
         response = await service.add(values);
-        console.log("Add response:", response);
+      Notification({
+        title: "Successfully added",
+        type: "success",
+      })
       }
 
       if (response.status === 200 || response.status === 201) {

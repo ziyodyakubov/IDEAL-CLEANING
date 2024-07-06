@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import Notification from "../../utils/notification";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -58,9 +59,14 @@ const Index = () => {
     try {
       const response = await service.delete(id);
       if (response.status === 200) {
-        setServices((prevServices) =>
-          prevServices.filter((service) => service.id !== id)
-        );
+      Notification({
+        title: "Successfully deleted",
+        type: "success",
+      })
+
+      setTimeout(function(){
+        window.location.reload()
+      },2000)
       }
     } catch (error) {
       console.error("Error deleting item:", error);

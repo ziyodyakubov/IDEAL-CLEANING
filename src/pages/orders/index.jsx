@@ -5,6 +5,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
+import Notification from "../../utils/notification";
 import MessageIcon from "@mui/icons-material/Message";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -75,8 +76,16 @@ const Index = () => {
     try {
       const response = await order.delete(id);
       if (response.status === 200) {
+      Notification({
+        title: "Successfully deleted",
+        type: "success",
+      })
+
+      setTimeout(function(){
         window.location.reload()
+      },2000)
       }
+
     } catch (error) {
       console.error("Error deleting item:", error);
     }
