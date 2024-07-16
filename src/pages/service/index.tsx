@@ -13,7 +13,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import service from "../../service/service";
 import ServiceModal from "../../components/modal/sevice-modal";
-import { Service } from "../../types/service"
+import { Service } from "../../types/service";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -37,7 +37,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const Index: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [edit, setEdit] = useState<Service | null>(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {

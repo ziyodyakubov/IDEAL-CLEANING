@@ -4,7 +4,7 @@ import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import { ServiceValidationSchema } from "../../../utils/validation";
 import service from "../../../service/service";
 import Notification from "../../../utils/notification";
-import { ServiceModal,ServiceModalProps } from "../../../types/service";
+import { ServiceModal2, ServiceModalProps } from "../../../types/service";
 
 const style = {
   position: "absolute" as "absolute",
@@ -21,12 +21,12 @@ const style = {
 };
 
 const ServiceModal: React.FC<ServiceModalProps> = ({ open, handleClose, edit, fetchData }) => {
-  const initialValues: ServiceModal = {
+  const initialValues: ServiceModal2 = {
     name: edit ? edit.name : "",
     price: edit ? edit.price : 0,
   };
 
-  const handleSubmit = async (values: ServiceModal, { setSubmitting }: FormikHelpers<ServiceModal>) => {
+  const handleSubmit = async (values: ServiceModal2, { setSubmitting }: FormikHelpers<ServiceModal2>) => {
     try {
       console.log("Submitted values:", values);
       let response;
