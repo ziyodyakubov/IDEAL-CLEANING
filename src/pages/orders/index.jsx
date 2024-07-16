@@ -142,14 +142,15 @@ const Index = () => {
                   <StyledTableCell align="right">{row.status}</StyledTableCell>
                   <StyledTableCell align="right">
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
-                      <DeleteIcon color="black"
+
+                      <EditIcon  className="text-blue-600" 
+                      style={{ cursor: "pointer" }}
+                        onClick={() => editItem(row)} />
+
+                          <DeleteIcon className="text-blue-500"
                         style={{ cursor: "pointer" }}
                         onClick={() => deleteItem(row.id)}
                       />
-
-                      <EditIcon color="black" 
-                      style={{ cursor: "pointer" }}
-                        onClick={() => editItem(row)} />
                      
                     </div>
                   </StyledTableCell>

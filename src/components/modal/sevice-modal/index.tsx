@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Modal, Button, TextField } from "@mui/material";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import { ServiceValidationSchema } from "../../../utils/validation";
 import service from "../../../service/service";
 import Notification from "../../../utils/notification";
+import { ServiceModal,ServiceModalProps } from "../../../types/service";
 
 const style = {
-  position: "absolute",
+  position: "absolute" as "absolute",
   top: "50%",
   left: "50%",
   borderRadius: 1.3,
@@ -19,28 +20,28 @@ const style = {
   outline: "none",
 };
 
-const ServiceModal = ({ open, handleClose, edit, fetchData }) => {
-  const initialValues = {
+const ServiceModal: React.FC<ServiceModalProps> = ({ open, handleClose, edit, fetchData }) => {
+  const initialValues: ServiceModal = {
     name: edit ? edit.name : "",
     price: edit ? edit.price : 0,
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: ServiceModal, { setSubmitting }: FormikHelpers<ServiceModal>) => {
     try {
       console.log("Submitted values:", values);
       let response;
       if (edit && edit.id) {
         response = await service.edit({ id: edit.id, ...values });
-      Notification({
-        title: "Successfully edited",
-        type: "success",
-      })
+        Notification({
+          title: "Successfully edited",
+          type: "success",
+        });
       } else {
         response = await service.add(values);
-      Notification({
-        title: "Successfully added",
-        type: "success",
-      })
+        Notification({
+          title: "Successfully added",
+          type: "success",
+        });
       }
 
       if (response.status === 200 || response.status === 201) {
@@ -51,6 +52,8 @@ const ServiceModal = ({ open, handleClose, edit, fetchData }) => {
       }
     } catch (err) {
       console.error("Error submitting form: ", err.response ? err.response.data : err);
+    } finally {
+      setSubmitting(false);
     }
   };
 

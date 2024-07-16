@@ -13,6 +13,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import service from "../../service/service";
 import ServiceModal from "../../components/modal/sevice-modal";
+import { Service } from "../../types/service"
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,11 +34,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const Index = () => {
-  const [services, setServices] = useState([]);
-  const [edit, setEdit] = useState(null);
+const Index: React.FC = () => {
+  const [services, setServices] = useState<Service[]>([]);
+  const [edit, setEdit] = useState<Service | null>(null);
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -55,25 +56,34 @@ const Index = () => {
     fetchData();
   }, []);
 
-  const deleteItem = async (id) => {
+  const deleteItem = async (id: string) => {
     try {
       const response = await service.delete(id);
       if (response.status === 200) {
-      Notification({
-        title: "Successfully deleted",
-        type: "success",
-      })
+        Notification({
+          title: "Successfully deleted",
+          type: "success",
+        });
 
-      setTimeout(function(){
-        window.location.reload()
-      },2000)
+        setServices((prevServices) => prevServices.filter((service) => service.id !== id));
+      } else if (response.status === 400) {
+        Notification({
+          title: "Bad Request",
+          type: "error",
+          message: response.data.message || "There was an issue with the request.",
+        });
       }
     } catch (error) {
       console.error("Error deleting item:", error);
+      Notification({
+        title: "Error",
+        type: "error",
+        message: "An error occurred while trying to delete the item.",
+      });
     }
   };
 
-  const editItem = (row) => {
+  const editItem = (row: Service) => {
     setEdit(row);
     setOpen(true);
   };
@@ -114,10 +124,10 @@ const Index = () => {
                 <StyledTableCell>{row.name.charAt(0).toUpperCase() + row.name.slice(1)}</StyledTableCell>
                 <StyledTableCell align="center">{`${row.price} UZS`}</StyledTableCell>
                 <StyledTableCell align="center">
-                  <Button>
-                    <EditIcon color="error" onClick={() => editItem(row)} />
-                    <DeleteIcon color="error" onClick={() => deleteItem(row.id)} />
-                  </Button>
+                  <div className="flex items-center gap-2 justify-center">
+                    <EditIcon className="cursor-pointer text-blue-600" onClick={() => editItem(row)} />
+                    <DeleteIcon className="cursor-pointer text-blue-500" onClick={() => deleteItem(row.id)} />
+                  </div>
                 </StyledTableCell>
               </StyledTableRow>
             ))}
