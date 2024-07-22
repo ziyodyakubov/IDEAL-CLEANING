@@ -13,6 +13,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import order from "../../service/order";
+import Pagination from "@mui/material/Pagination";
 import OrderModal from "./../../components/modal/order-modal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -39,22 +40,36 @@ const Index = () => {
   const [edit, setEdit] = useState(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [count,setCount] = useState(0)
+  const [params,setParams] = useState({
+    limit: 5,
+    page: 1
+  })
 
-  const fetchData = async () => {
-    try {
-      const response = await order.get();
-      if (response.status === 200) {
-        setOrders(response?.data?.orders_list);
-      }
-    } catch (error) {
-      setError("Error fetching data");
-      console.error("Error fetching data:", error);
+ const fetchData = async () => {
+  try {
+    const response = await order.get(params);
+    if (response.status === 200) {
+      setOrders(response?.data?.orders_list);
+      let total = Math.ceil(response.data.total / params.limit);
+      setCount(total);
     }
-  };
+  } catch (error) {
+    setError("Error fetching data");
+    console.error("Error fetching data:", error);
+  }
+};
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+useEffect(() => {
+  fetchData();
+}, [params]);
+
+const handleChange = (event, value) => {
+  setParams((prevParams) => ({
+    ...prevParams,
+    page: value,
+  }));
+};
 
 
   // const getData = async () => {
@@ -159,6 +174,8 @@ const Index = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Pagination className="flex justify-center mt-4 text-[#fff]" count={count} page={params.page} onChange={handleChange}  />
 
       <OrderModal open={open} handleClose={handleClose} edit={edit} fetchData={fetchData} />
     </div>

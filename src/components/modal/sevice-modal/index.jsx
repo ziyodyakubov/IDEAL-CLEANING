@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Modal, Button, TextField } from "@mui/material";
-import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import { ServiceValidationSchema } from "../../../utils/validation";
 import service from "../../../service/service";
 import Notification from "../../../utils/notification";
-import { ServiceModal2, ServiceModalProps } from "../../../types/service";
 
 const style = {
-  position: "absolute" as "absolute",
+  position: "absolute",
   top: "50%",
   left: "50%",
   borderRadius: 1.3,
@@ -20,13 +19,13 @@ const style = {
   outline: "none",
 };
 
-const ServiceModal: React.FC<ServiceModalProps> = ({ open, handleClose, edit, fetchData }) => {
-  const initialValues: ServiceModal2 = {
+const ServiceModal = ({ open, handleClose, edit, fetchData }) => {
+  const initialValues = {
     name: edit ? edit.name : "",
     price: edit ? edit.price : 0,
   };
 
-  const handleSubmit = async (values: ServiceModal2, { setSubmitting }: FormikHelpers<ServiceModal2>) => {
+  const handleSubmit = async (values,{ setSubmitting }) => {
     try {
       console.log("Submitted values:", values);
       let response;

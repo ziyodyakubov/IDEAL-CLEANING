@@ -12,8 +12,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import service from "../../service/service";
+import Pagination from "@mui/material/Pagination";
 import ServiceModal from "../../components/modal/sevice-modal";
-import { Service } from "../../types/service";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -34,29 +34,44 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const Index: React.FC = () => {
-  const [services, setServices] = useState<Service[]>([]);
-  const [edit, setEdit] = useState<Service | null>(null);
-  const [open, setOpen] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+const Index = () => {
+  const [services, setServices] = useState([]);
+  const [edit, setEdit] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [count,setCount] = useState(0)
+  const [params,setParams] = useState({
+    limit: 5,
+    page: 1
+  })
 
-  const fetchData = async () => {
-    try {
-      const response = await service.get();
-      if (response.status === 200) {
-        setServices(response.data.services);
-      }
-    } catch (error) {
-      setError("Error fetching data");
-      console.error("Error fetching data:", error);
+ const fetchData = async () => {
+  try {
+    const response = await service.get(params);
+    if (response.status === 200) {
+      setServices(response.data.services);
+      let total = Math.ceil(response.data.total / params.limit);
+      setCount(total);
     }
-  };
+  } catch (error) {
+    setError("Error fetching data");
+    console.error("Error fetching data:", error);
+  }
+};
+
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [params]);
 
-  const deleteItem = async (id: string) => {
+  const handleChange = (event, value) => {
+  setParams((prevParams) => ({
+    ...prevParams,
+    page: value,
+  }));
+};
+
+  const deleteItem = async (id) => {
     try {
       const response = await service.delete(id);
       if (response.status === 200) {
@@ -83,7 +98,7 @@ const Index: React.FC = () => {
     }
   };
 
-  const editItem = (row: Service) => {
+  const editItem = (row) => {
     setEdit(row);
     setOpen(true);
   };
@@ -134,6 +149,8 @@ const Index: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Pagination className="flex justify-center mt-4 text-[#fff]" count={count} page={params.page} onChange={handleChange}  />
 
       <ServiceModal open={open} handleClose={handleClose} edit={edit} fetchData={fetchData} />
     </div>

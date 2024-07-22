@@ -3,7 +3,7 @@ import { Box, Typography, Modal, Button, TextField, Select, MenuItem } from "@mu
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { orderValidationSchema } from "../../../utils/validation";
 import order from "../../../service/order";
-import service from "../../../service/service"
+import service from "../../../service/service";
 import Notification from "../../../utils/notification";
 
 const style = {
@@ -21,7 +21,13 @@ const style = {
 };
 
 const OrderModal = ({ open, handleClose, edit, fetchData }) => {
-    const [services, setServices] = useState([])
+    const [services, setServices] = useState([]);
+    const [error, setError] = useState(null); 
+    const [params, setParams] = useState({
+        limit: 5,
+        page: 1
+    });
+
     const initialValues = {
         amount: edit ? edit.amount : 0,
         client_full_name: edit ? edit.client_full_name : "",
@@ -29,10 +35,9 @@ const OrderModal = ({ open, handleClose, edit, fetchData }) => {
         service_id: edit ? edit.service_id : ""
     };
 
-
     const fetchInfo = async () => {
         try {
-            const response = await service.get();
+            const response = await service.get(params);
             if (response.status === 200) {
                 setServices(response.data.services);
             }
@@ -44,12 +49,12 @@ const OrderModal = ({ open, handleClose, edit, fetchData }) => {
 
     useEffect(() => {
         fetchInfo();
-    }, []);
+    }, [params]);
 
     const handleSubmit = async (values) => {
         try {
             console.log("Submitted values:", values);
-            const payload = { id: service.id, ...values }
+            const payload = edit ? { id: edit.id, ...values } : values;
 
             let response;
             if (edit && edit.id) {
@@ -57,19 +62,18 @@ const OrderModal = ({ open, handleClose, edit, fetchData }) => {
                 Notification({
                     title: "Successfully edited",
                     type: "success",
-                })
+                });
             } else {
                 response = await order.add(payload);
                 Notification({
                     title: "Successfully added",
                     type: "success",
-                })
+                });
             }
 
             if (response.status === 201) {
                 fetchData();
                 handleClose();
-                console.log("Boganku")
             } else {
                 console.error("Error: ", response.statusText, response.data);
             }
@@ -112,7 +116,7 @@ const OrderModal = ({ open, handleClose, edit, fetchData }) => {
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    helperText={<ErrorMessage name="name" component="span" />}
+                                    helperText={<ErrorMessage name="amount" component="span" />}
                                 />
                                 <Field
                                     name="client_full_name"
@@ -122,7 +126,7 @@ const OrderModal = ({ open, handleClose, edit, fetchData }) => {
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    helperText={<ErrorMessage name="price" component="span" />}
+                                    helperText={<ErrorMessage name="client_full_name" component="span" />}
                                 />
                                 <Field
                                     name="client_phone_number"
@@ -132,23 +136,20 @@ const OrderModal = ({ open, handleClose, edit, fetchData }) => {
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    helperText={<ErrorMessage name="price" component="span" />}
+                                    helperText={<ErrorMessage name="client_phone_number" component="span" />}
                                 />
 
                                 <Field
                                     name="service_id"
-                                    type="text"
                                     as={Select}
                                     fullWidth
                                     margin="normal"
                                     variant="outlined"
-                                    helperText={<ErrorMessage name="price" component="span" />}
+                                    helperText={<ErrorMessage name="service_id" component="span" />}
                                 >
                                     {services.map((item, index) => (
                                         <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
-                                    )
-                                    )}
-
+                                    ))}
                                 </Field>
 
                                 <div
